@@ -1,5 +1,5 @@
-Package: data.sfb12
-Title: SFB12 Data
+Package: data.sfb14
+Title: SFB14 Data
 Version: 1.0.0
 Authors@R: 
     person("Tan", "Ho", , "tan@tanho.ca", role = c("aut", "cre","cph"))
@@ -22,3 +22,5 @@ Imports:
     distill,
     reactable,
     nflreadr
+URL: https://github.com/dynastyprocess/data.sfb14
+BugReports: https://github.com/dynastyprocess/data.sfb14/issues
