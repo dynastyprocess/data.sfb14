@@ -1,0 +1,60 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  workflow_dispatch:
+  schedule:
+   - cron: 0,20,40 * * 7 *
+
+name: update_adp
+
+jobs:
+  R-CMD-check:
+    runs-on: ${{ matrix.config.os }}
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: ubuntu-20.04,   r: 'release'}
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      MFL_USER_AGENT: ${{ secrets.MFL_USER_AGENT }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with: 
+          extra-packages: ropensci/piggyback
+
+      - name: Run adp update
+        run: |
+          source("update_mfl.R")
+          source("update_sleeper.R")
+        shell: Rscript {0}
+
+      - name: Build site
+        run: |
+          rmarkdown::render_site()
+        shell: Rscript {0}
+
+      - name: Commit and push
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "Actions User"
+          git stash
+          git pull
+          git stash apply
+          git add docs
+          git commit -m "adp site update `date`"
+          git push origin gh-pages

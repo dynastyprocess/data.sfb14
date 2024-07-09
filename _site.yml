@@ -1,0 +1,13 @@
+name: "SFB13 ADP by DynastyProcess.com"
+title: "SFB13 ADP"
+description: |
+  A simple site of SFB13 ADP, by DynastyProcess.com
+output_dir: "docs"
+theme: dynastyprocess.css
+navbar:
+  right:
+    - text: "Home"
+      href: index.html
+    - text: "@_TanHo on Twitter"
+      href: https://twitter.com/_TanHo
+output: distill::distill_article

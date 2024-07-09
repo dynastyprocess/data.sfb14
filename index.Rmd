@@ -1,0 +1,131 @@
+---
+title: "sfb13 ADP"
+description: A simple ADP site for sfb13, by \@\_TanHo
+site: distill::distill_website
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+suppressPackageStartupMessages({
+  library(reactable)
+  library(nflreadr)
+  library(dplyr)
+  library(tidyr)
+})
+```
+```{r include = FALSE}
+picks_mfl <- data.table::fread("https://github.com/dynastyprocess/data-sfb13/releases/download/data-mfl/draft_picks_mfl.csv") |> 
+  mutate(player_id = as.character(player_id))
+
+picks_sleeper <- data.table::fread("https://github.com/dynastyprocess/data-sfb13/releases/download/data-sleeper/draft_picks_sleeper.csv") |> 
+  mutate(player_id = as.character(player_id))
+
+timestamp <- readLines("https://github.com/dynastyprocess/data-sfb13/releases/download/data-sleeper/timestamp.txt")
+
+player_ids <- nflreadr::load_ff_playerids() |> 
+  select(mfl_id, sleeper_id, name, position, team) |> 
+  filter(position %in% c("QB","RB","WR","TE","PK")) 
+
+picks_mfl_prep <- picks_mfl |> 
+  filter(!is.na(player_id)) |> 
+  mutate(mfl_id = player_id) |> 
+  group_by(league_id, pos) |>
+  mutate(pos_rank = rank(overall)) |> 
+  ungroup() |> 
+  select(league_id, league_name, round, overall, pos_rank, mfl_id) |> 
+  left_join(player_ids, by = "mfl_id", na_matches = "never") |> 
+  mutate(league_id = as.character(league_id))
+
+picks_sleeper_prep <- picks_sleeper |> 
+  filter(!is.na(player_id)) |>
+  group_by(league_id) |>
+  mutate(overall = row_number()) |>
+  group_by(league_id,pos) |>
+  mutate(pos_rank = rank(overall)) |> 
+  ungroup() |> 
+  select(league_id, league_name, round, overall, pos_rank, sleeper_id = player_id) |> 
+  left_join(player_ids, by = "sleeper_id", na_matches = "never") |> 
+  mutate(league_id = as.character(league_id))
+
+picks <- bind_rows(picks_mfl_prep, picks_sleeper_prep) 
+
+adp <- picks |> 
+  group_by(mfl_id, sleeper_id, name, position, team) |>
+  summarise(
+    n = n(),
+    ovr_avg = mean(overall, na.rm = TRUE) |> round(1),
+    ovr_sd = sd(overall, na.rm = TRUE) |> round(1),
+    pos_avg = mean(pos_rank, na.rm = TRUE) |> round(1),
+    pos_sd = sd(pos_rank, na.rm = TRUE) |> round(1),
+    ovr_min = min(overall, na.rm = TRUE),
+    ovr_max = max(overall, na.rm = TRUE),
+    pos_min = min(pos_rank, na.rm = TRUE),
+    pos_max = max(pos_rank, na.rm = TRUE)
+  ) |>
+  ungroup() |>
+  arrange(ovr_avg,-n)
+
+avail <- tidyr::crossing(
+  picks |> distinct(league_id, league_name),
+  adp
+) |> 
+  anti_join(picks, by = c("mfl_id","sleeper_id", "league_id")) |> 
+  arrange(league_id, ovr_avg, -n)
+
+```
+
+Last updated `r timestamp`. 
+
+# ADP
+Across all MFL and Sleeper drafts.
+
+```{r layout = "l-page"}
+adp |> 
+  select(-mfl_id, -sleeper_id, -contains("_min"), -contains("_max")) |>
+  rename(pos = position) |>
+  dplyr::rename_with(~gsub("_"," ", .x)) |> 
+  reactable(
+    columns = list(
+      name = colDef(minWidth = 120)
+    ),
+    defaultColDef = colDef(minWidth = 60),
+    filterable = TRUE,
+    sortable = TRUE,
+    striped = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    resizable = TRUE,
+    showPageSizeOptions = TRUE
+  )
+```
+
+# Best Available
+
+```{r layout = "l-page"}
+avail |> 
+  select(league_name, name, pos=position, team, n, ovr_avg, ovr_sd, pos_avg, pos_sd) |> 
+  dplyr::rename_with(~gsub("_"," ", .x)) |> 
+  mutate(rank = "", .before = name) |> 
+  reactable(
+    columns = list(
+      `league name` = colDef(minWidth = 150),
+      `rank` = colDef(
+        cell = JS(
+          "function(cellInfo, state){
+          return Number(cellInfo.viewIndex) + Number(state.page) * Number(state.pageSize) + 1
+          }"
+        )
+      ),
+      name = colDef(minWidth = 120)
+    ),
+    defaultColDef = colDef(minWidth = 60),
+    filterable = TRUE,
+    sortable = TRUE,
+    striped = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    resizable = TRUE,
+    showPageSizeOptions = TRUE
+  )
+```
+
