@@ -1,6 +1,6 @@
 ---
-title: "sfb13 ADP"
-description: A simple ADP site for sfb13, by \@\_TanHo
+title: "sfb14 ADP"
+description: A simple ADP site for sfb14, by \@\_TanHo
 site: distill::distill_website
 ---
 
@@ -14,17 +14,17 @@ suppressPackageStartupMessages({
 })
 ```
 ```{r include = FALSE}
-picks_mfl <- data.table::fread("https://github.com/dynastyprocess/data-sfb13/releases/download/data-mfl/draft_picks_mfl.csv") |> 
+picks_mfl <- data.table::fread("https://github.com/dynastyprocess/data.sfb14/releases/download/data-mfl/draft_picks_mfl.csv") |> 
   mutate(player_id = as.character(player_id))
 
-picks_sleeper <- data.table::fread("https://github.com/dynastyprocess/data-sfb13/releases/download/data-sleeper/draft_picks_sleeper.csv") |> 
+picks_sleeper <- data.table::fread("https://github.com/dynastyprocess/data.sfb14/releases/download/data-sleeper/draft_picks_sleeper.csv") |> 
   mutate(player_id = as.character(player_id))
 
-timestamp <- readLines("https://github.com/dynastyprocess/data-sfb13/releases/download/data-sleeper/timestamp.txt")
+timestamp <- readLines("https://github.com/dynastyprocess/data.sfb14/releases/download/data-sleeper/timestamp.txt")
 
 player_ids <- nflreadr::load_ff_playerids() |> 
   select(mfl_id, sleeper_id, name, position, team) |> 
-  filter(position %in% c("QB","RB","WR","TE","PK")) 
+  filter(position %in% c("QB","RB","WR","TE","PK"))
 
 picks_mfl_prep <- picks_mfl |> 
   filter(!is.na(player_id)) |> 

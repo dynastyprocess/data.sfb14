@@ -7,11 +7,11 @@ library(stringr)
 library(piggyback)
 library(cli)
 
-leagues <- sleeper_userleagues("ScottFishBowl", 2024) |>
-  select(league_id, league_name) |>
-  filter(str_detect(league_name,"\\#SFB14")) |>
-  filter(!str_detect(league_name, "Mirror")) |>
-  mutate(league_id = as.character(league_id))
+# leagues <- sleeper_userleagues("ScottFishBowl", 2024) |>
+#   select(league_id, league_name) |>
+#   filter(str_detect(league_name,"\\#SFB14")) |>
+#   filter(!str_detect(league_name, "Mirror")) |>
+#   mutate(league_id = as.character(league_id))
 
 # fwrite(leagues,"league_ids_sleeper.csv")
 leagues <- fread("league_ids_sleeper.csv")
@@ -56,6 +56,6 @@ fwrite(drafts,"output/draft_picks_sleeper.csv",quote = TRUE)
 fwrite(adp,"output/adp_sleeper.csv",quote = TRUE)
 update_time <- format(Sys.time(), tz = "America/Toronto", usetz = TRUE)
 writeLines(update_time, "output/timestamp.txt")
-pb_upload("output/draft_picks_sleeper.csv", repo = "dynastyprocess/data-sfb14", tag = "data-sleeper")
-pb_upload("output/adp_sleeper.csv", repo = "dynastyprocess/data-sfb14", tag = "data-sleeper")
-pb_upload("output/timestamp.txt", repo = "dynastyprocess/data-sfb14", tag = "data-sleeper")
+pb_upload("output/draft_picks_sleeper.csv", repo = "dynastyprocess/data.sfb14", tag = "data-sleeper")
+pb_upload("output/adp_sleeper.csv", repo = "dynastyprocess/data.sfb14", tag = "data-sleeper")
+pb_upload("output/timestamp.txt", repo = "dynastyprocess/data.sfb14", tag = "data-sleeper")

@@ -37,8 +37,8 @@ drafts <- leagues |>
 fwrite(drafts,"output/draft_picks_mfl.csv",quote = TRUE)
 update_time <- format(Sys.time(), tz = "America/Toronto", usetz = TRUE)
 writeLines(update_time, "output/timestamp.txt")
-pb_upload("output/draft_picks_mfl.csv", repo = "dynastyprocess/data-sfb14", tag = "data-mfl")
-pb_upload("output/timestamp.txt", repo = "dynastyprocess/data-sfb14", tag = "data-mfl")
+pb_upload("output/draft_picks_mfl.csv", repo = "dynastyprocess/data.sfb14", tag = "data-mfl")
+pb_upload("output/timestamp.txt", repo = "dynastyprocess/data.sfb14", tag = "data-mfl")
 
 drafts <- fread("output/draft_picks_mfl.csv")
 
@@ -64,7 +64,7 @@ adp <- drafts |>
 fwrite(adp,"output/adp_mfl.csv")
 update_time <- format(Sys.time(), tz = "America/Toronto", usetz = TRUE)
 writeLines(update_time, "output/timestamp.txt")
-pb_upload("output/adp_mfl.csv", repo = "dynastyprocess/data-sfb14", tag = "data-mfl")
-pb_upload("output/timestamp.txt", repo = "dynastyprocess/data-sfb14", tag = "data-mfl")
+pb_upload("output/adp_mfl.csv", repo = "dynastyprocess/data.sfb14", tag = "data-mfl")
+pb_upload("output/timestamp.txt", repo = "dynastyprocess/data.sfb14", tag = "data-mfl")
 
 cli::cli_alert_success("Successfully got all picks and ADP!")
