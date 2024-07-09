@@ -1,7 +1,7 @@
-name: "SFB13 ADP by DynastyProcess.com"
-title: "SFB13 ADP"
+name: "SFB14 ADP by DynastyProcess.com"
+title: "SFB14 ADP"
 description: |
-  A simple site of SFB13 ADP, by DynastyProcess.com
+  A simple site of SFB14 ADP, by DynastyProcess.com
 output_dir: "docs"
 theme: dynastyprocess.css
 navbar:
