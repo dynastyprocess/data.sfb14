@@ -1,9 +1,9 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
-  workflow_dispatch:
   schedule:
    - cron: 0,20,40 * * 7 *
+  workflow_dispatch:
 
 name: update_adp
 
@@ -57,4 +57,4 @@ jobs:
           git stash apply
           git add docs
           git commit -m "adp site update `date`"
-          git push origin gh-pages
+          git push origin main
