@@ -8,6 +8,8 @@ navbar:
   right:
     - text: "Home"
       href: index.html
-    - text: "@_TanHo on Twitter"
-      href: https://twitter.com/_TanHo
+    - text: "GitHub"
+      href: https://github.com/dynastyprocess/data.sfb14
+    - text: "tanho.ca"
+      href: https://tanho.ca
 output: distill::distill_article
