@@ -104,6 +104,8 @@ adp |>
 ```{r layout = "l-page"}
 avail |> 
   select(league_name, name, pos=position, team, n, ovr_avg, ovr_sd, pos_avg, pos_sd) |> 
+  mutate(league_name = forcats::fct_relevel(league_name, "#SFB14 - Luigi")) |> 
+  dplyr::arrange(league_name) |> 
   dplyr::rename_with(~gsub("_"," ", .x)) |> 
   mutate(rank = "", .before = name) |> 
   reactable(
