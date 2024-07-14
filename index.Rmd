@@ -70,7 +70,7 @@ avail <- tidyr::crossing(
   adp
 ) |> 
   anti_join(picks, by = c("mfl_id","sleeper_id", "league_id")) |> 
-  arrange(league_id, ovr_avg, -n)
+  arrange(league_id, n < 5, ovr_avg, -n)
 
 ```
 
