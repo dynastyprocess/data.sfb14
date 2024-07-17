@@ -32,7 +32,7 @@ picks_mfl_prep <- picks_mfl |>
   group_by(league_id, pos) |>
   mutate(pos_rank = rank(overall)) |> 
   ungroup() |> 
-  select(league_id, league_name, round, overall, pos_rank, mfl_id) |> 
+  select(league_id, league_name, franchise_id, franchise_name, round, overall, pos_rank, mfl_id) |> 
   left_join(player_ids, by = "mfl_id", na_matches = "never") |> 
   mutate(league_id = as.character(league_id))
 
@@ -43,16 +43,18 @@ picks_sleeper_prep <- picks_sleeper |>
   group_by(league_id,pos) |>
   mutate(pos_rank = rank(overall)) |> 
   ungroup() |> 
-  select(league_id, league_name, round, overall, pos_rank, sleeper_id = player_id) |> 
+  select(league_id, league_name, franchise_id, franchise_name, round, overall, pos_rank, sleeper_id = player_id) |> 
   left_join(player_ids, by = "sleeper_id", na_matches = "never") |> 
   mutate(league_id = as.character(league_id))
 
-picks <- bind_rows(picks_mfl_prep, picks_sleeper_prep) 
+picks <- bind_rows(picks_mfl_prep, picks_sleeper_prep) |> 
+  tidyr::complete(nesting(league_id, league_name), nesting(mfl_id, sleeper_id, name, position, team)) |> 
+  dplyr::mutate(overall = ifelse(is.na(overall) & sum(!is.na(overall)) == 264, 265, overall), .by = league_id)
 
 adp <- picks |> 
   group_by(mfl_id, sleeper_id, name, position, team) |>
   summarise(
-    n = n(),
+    n = sum(!is.na(overall)),
     ovr_avg = mean(overall, na.rm = TRUE) |> round(1),
     ovr_sd = sd(overall, na.rm = TRUE) |> round(1),
     pos_avg = mean(pos_rank, na.rm = TRUE) |> round(1),
@@ -70,7 +72,7 @@ avail <- tidyr::crossing(
   adp
 ) |> 
   anti_join(picks, by = c("mfl_id","sleeper_id", "league_id")) |> 
-  arrange(league_id, n < 5, ovr_avg, -n)
+  arrange(league_id, ovr_avg, -n)
 
 ```
 
