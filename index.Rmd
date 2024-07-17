@@ -71,7 +71,10 @@ avail <- tidyr::crossing(
   picks |> distinct(league_id, league_name),
   adp
 ) |> 
-  anti_join(picks, by = c("mfl_id","sleeper_id", "league_id")) |> 
+  anti_join(
+    picks |> dplyr::filter(!is.na(overall)), 
+    by = c("mfl_id","sleeper_id", "league_id")
+  ) |> 
   arrange(league_id, ovr_avg, -n)
 
 ```
