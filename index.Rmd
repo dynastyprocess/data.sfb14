@@ -77,6 +77,14 @@ avail <- tidyr::crossing(
   ) |> 
   arrange(league_id, ovr_avg, -n)
 
+writeLines(format(Sys.time(), tz = "America/Toronto", usetz = TRUE), "output/timestamp.txt")
+data.table::fwrite(adp,"output/adp.csv")
+data.table::fwrite(picks,"output/picks.csv")
+data.table::fwrite(avail, "output/available.csv")
+piggyback::pb_upload("output/adp.csv", repo = "dynastyprocess/data.sfb14", tag = "data-global")
+piggyback::pb_upload("output/picks.csv", repo = "dynastyprocess/data.sfb14", tag = "data-global")
+piggyback::pb_upload("output/available.csv", repo = "dynastyprocess/data.sfb14", tag = "data-global")
+piggyback::pb_upload("output/timestamp.txt", repo = "dynastyprocess/data.sfb14", tag = "data-global")
 ```
 
 Last updated `r timestamp`. 
